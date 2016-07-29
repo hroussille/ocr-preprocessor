@@ -2,7 +2,14 @@
 
 using namespace cv;
 
-bool preprocess(std::string sourcePath, std::string destinationPath)
+bool preprocess(std::string sourcePath, 
+                std::string destinationPath ,
+                unsigned int blur , 
+                unsigned int threshold, 
+                unsigned int matrix , 
+                unsigned int constant , 
+                bool revert , 
+                bool isolate)
 {
   Mat src;
   Mat dst;
@@ -12,7 +19,7 @@ bool preprocess(std::string sourcePath, std::string destinationPath)
   int largest_area = -1;
 
   Rect bounding_rect;
-  Size size(3, 3);
+  Size size(blur, blur);
 
   vector<vector<Point> > contours;
   vector<Vec4i> hierarchy;
@@ -25,9 +32,9 @@ bool preprocess(std::string sourcePath, std::string destinationPath)
   cvtColor(src, dst, CV_BGR2GRAY);
   GaussianBlur(dst, dst, size, 0);
 
-  adaptiveThreshold(dst, dst, 255,
+  adaptiveThreshold(dst, dst, threshold,
       CV_ADAPTIVE_THRESH_MEAN_C,
-      CV_THRESH_BINARY, 75, 10);
+      CV_THRESH_BINARY, matrix, constant);
 
   dtc = dst.clone();
 

@@ -20,7 +20,16 @@ class AsyncPreprocessor: public AsyncWorker {
 
   public:
 
-  AsyncPreprocessor(std::string inputPath , std::string outputPath , Callback* callback);
+  AsyncPreprocessor(std::string inputPath , 
+                    std::string outputPath , 
+                    unsigned int blur ,
+                    unsigned int threshold ,
+                    unsigned int matrix ,
+                    unsigned int constant ,
+                    bool revert ,
+                    bool isolate ,
+                    Callback* callback);
+
   ~AsyncPreprocessor(); 
 
   void Execute();
@@ -28,9 +37,17 @@ class AsyncPreprocessor: public AsyncWorker {
 
   private:
  
-  std::string _inputPath;
-  std::string _outputPath;
-  bool _result;
+  std::string  _inputPath;
+  std::string  _outputPath;
+
+  unsigned int _blur;
+  unsigned int _threshold;
+  unsigned int _matrix;
+  unsigned int _constant;
+
+  bool         _revert;
+  bool         _isolate;
+  bool         _result;
 
 };
 
