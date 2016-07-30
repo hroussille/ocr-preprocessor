@@ -76,7 +76,7 @@ bool preprocess(std::string sourcePath,
     return false;
 
   cvtColor(src, dst, CV_BGR2GRAY);
-  guard(matrix);
+  guard(matrix , blur);
 
   if (blur > 0)
     doBlur(dst , blur);

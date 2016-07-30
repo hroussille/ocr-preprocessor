@@ -23,6 +23,6 @@ void doIsole(Mat & target);
 
 void doRevert(Mat & target);
 
-void guard(unsigned int & matrix);
+void guard(unsigned int & matrix , unsigned int & blur);
 
 #endif // PREPROCESSOR_HH
