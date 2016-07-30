@@ -47,12 +47,15 @@ void doRevert(Mat & target)
   cv::bitwise_not(target, target);
 }
 
-void guard(unsigned int & matrix)
+void guard(unsigned int & matrix , unsigned int & blur)
 {
   if (matrix < 3)
     matrix = 3;
   else if (matrix % 2 == 0)
     matrix = matrix + 1;
+
+  if (blur > 0 && blur % 2 == 0)
+    blur = blur + 1;
 }
 
 
