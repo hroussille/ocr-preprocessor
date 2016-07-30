@@ -36,7 +36,7 @@ preprocessor("./test.jpg" , "./result.jpg" , options , function(err , path) {
 
 ## Exports
 
-This module export a single function : preprocess
+This module export itself as a function 
 
 This function accept 4 arguments : 
 
@@ -44,6 +44,17 @@ This function accept 4 arguments :
 * output path : path to save the processed image
 * options : options for the preprocessing
 * callback  : callback function to execute when done.
+
+
+### Options
+
+* blur : blur value - default to 0
+* threshold : threshold value - default to 255
+* matrix : matrix-size used for thresholding - default to 3
+* const : constant used for thresholding - default to 5
+* revert : does the image need to be reverted - default to false
+* isolate : does the biggest region of the imaged need to be isolated - default to false
+
 
 ## Asynchronous
 
