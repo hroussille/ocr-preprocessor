@@ -1,6 +1,11 @@
-var preprocessor = require("./build/Release/ByBat-preprocessor");
+var preprocessor = require("./lib/bybat-preprocessor");
 
-preprocessor.preprocess("./test.jpg" , "./result.jpg" , function(err , path) {
+let options = { blur: 0 ,
+  threshold: 255
+};
+
+
+preprocessor("./test.jpg" , "./result.jpg" , options , function(err , path) {
   if (err) {
     console.log("Error !");
   }

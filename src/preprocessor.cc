@@ -2,43 +2,30 @@
 
 using namespace cv;
 
-bool preprocess(std::string sourcePath, 
-                std::string destinationPath ,
-                unsigned int blur , 
-                unsigned int threshold, 
-                unsigned int matrix , 
-                unsigned int constant , 
-                bool revert , 
-                bool isolate)
+void doBlur(Mat & target , unsigned int blur)
 {
-  Mat src;
-  Mat dst;
-  Mat dtc;
-  Mat rst;
+  Size size(blur , blur);
 
+  if (blur == 0)
+    return;
+
+  GaussianBlur(target , target , size , 0);
+}
+
+void doThreshold(Mat & target , unsigned int threshold , unsigned int matrix , unsigned int constant)
+{
+  adaptiveThreshold(target , target , threshold , CV_ADAPTIVE_THRESH_MEAN_C , CV_THRESH_BINARY , matrix , constant);
+}
+
+void doIsolate(Mat & target)
+{
+  Mat tmp = target.clone();
   int largest_area = -1;
-
   Rect bounding_rect;
-  Size size(blur, blur);
-
   vector<vector<Point> > contours;
   vector<Vec4i> hierarchy;
 
-  src = imread(sourcePath);
-
-  if (!src.data)
-    return false;
-
-  cvtColor(src, dst, CV_BGR2GRAY);
-  GaussianBlur(dst, dst, size, 0);
-
-  adaptiveThreshold(dst, dst, threshold,
-      CV_ADAPTIVE_THRESH_MEAN_C,
-      CV_THRESH_BINARY, matrix, constant);
-
-  dtc = dst.clone();
-
-  findContours(dtc, contours, hierarchy,
+  findContours(tmp, contours, hierarchy,
       CV_RETR_TREE,
       CV_CHAIN_APPROX_SIMPLE,
       Point(0, 0));
@@ -51,10 +38,52 @@ bool preprocess(std::string sourcePath,
     }
   }
 
-  if (largest_area == -1)
-    rst = dst;
-  else
-    rst = dst(bounding_rect);
+  if (largest_area != -1)
+    target  = target(bounding_rect);
+}
 
-  return imwrite(destinationPath, rst);
+void doRevert(Mat & target)
+{
+  cv::bitwise_not(target, target);
+}
+
+void guard(unsigned int & matrix)
+{
+  if (matrix < 3)
+    matrix = 3;
+  else if (matrix % 2 == 0)
+    matrix = matrix + 1;
+}
+
+
+bool preprocess(std::string sourcePath, 
+                std::string destinationPath ,
+                unsigned int blur , 
+                unsigned int threshold, 
+                unsigned int matrix , 
+                unsigned int constant , 
+                bool revert , 
+                bool isolate)
+{
+  Mat src;
+  Mat dst;
+
+  src = imread(sourcePath);
+  if (!src.data)
+    return false;
+
+  cvtColor(src, dst, CV_BGR2GRAY);
+  guard(matrix);
+
+  if (blur > 0)
+    doBlur(dst , blur);
+
+  doThreshold(dst , threshold , matrix , constant);
+
+  if (isolate)
+    doIsolate(dst);
+  if (revert)
+    doRevert(dst);
+
+  return imwrite(destinationPath, dst);
 }
