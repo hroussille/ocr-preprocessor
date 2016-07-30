@@ -1,6 +1,6 @@
 {
   "name": "ocr-preprocessor",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "asynchronous image preprocessor based on OpenCV for OCR engine",
   "author": "Hector Roussille (hector.roussile@gmail.com) & Alexandre Moulay (alex.moulay@gmail.com)",
   "dependencies": {
