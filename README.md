@@ -1,4 +1,4 @@
-# bybat-preprocessor
+# ocr-preprocessor
 
 This is a simple OCR preprocessor module for NodeJS.
 It has been made to isolate and detect Building licences on a picture , then process the image to make it suited for OCR. The result is a black text on white background.
@@ -8,7 +8,7 @@ It has been made to isolate and detect Building licences on a picture , then pro
 Install it like any node module , by running :
 
 ```sh
-npm install --save bybat-preprocessor
+npm install --save ocr-preprocessor
 ```
 
 Note : This module is for now only compatible with Linux. And OpenCV 2.X
@@ -18,13 +18,13 @@ Note : This module is for now only compatible with Linux. And OpenCV 2.X
 ### Require the package 
 
 ```js
-var preprocessor = require("bybat-preprocessor");
+var preprocessor = require("ocr-preprocessor");
 ```
 
 ### Use it on the image you want 
 
 ```js
-preprocessor.preprocess("./test.jpg" , "./result.jpg" , function(err , path) {
+preprocessor("./test.jpg" , "./result.jpg" , options , function(err , path) {
   if (err) {
     console.log("Error !");
   }
@@ -38,10 +38,11 @@ preprocessor.preprocess("./test.jpg" , "./result.jpg" , function(err , path) {
 
 This module export a single function : preprocess
 
-This function accept 3 arguments : 
+This function accept 4 arguments : 
 
 * input path   : path to the image to process
 * output path : path to save the processed image
+* options : options for the preprocessing
 * callback  : callback function to execute when done.
 
 ## Asynchronous
