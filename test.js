@@ -1,7 +1,10 @@
 var preprocessor = require("./lib/ocr-preprocessor");
 
 let options = { blur: 0 ,
-  threshold: 255
+  threshold: 255,
+  const: 50,
+  matrix: 21,
+  deskew: true
 };
 
 

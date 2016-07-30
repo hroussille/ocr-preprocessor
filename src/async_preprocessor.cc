@@ -1,24 +1,15 @@
 #include <async_preprocessor.hh>
 #include <preprocessor.hh>
+#include <Params.hh>
 
 AsyncPreprocessor::AsyncPreprocessor(std::string inputPath, 
                                      std::string outputPath, 
-                                     unsigned int blur , 
-                                     unsigned int threshold , 
-                                     unsigned int matrix , 
-                                     unsigned int constant , 
-                                     bool revert ,
-                                     bool isolate ,
+                                     Params params,
                                      Callback* callback)
 
     : _inputPath(inputPath)
     , _outputPath(outputPath)
-    , _blur(blur)
-    , _threshold(threshold)
-    , _matrix(matrix)
-    , _constant(constant)
-    , _revert(revert)
-    , _isolate(isolate)
+    , _params(params)
     , AsyncWorker(callback)
 {
   this->_result = false;
@@ -30,9 +21,7 @@ AsyncPreprocessor::~AsyncPreprocessor()
 
 void AsyncPreprocessor::Execute()
 {
-  this->_result = preprocess(this->_inputPath, this->_outputPath ,
-      this->_blur , this->_threshold , this->_matrix , this->_constant,
-      this->_revert , this->_isolate);
+  this->_result = preprocess(this->_inputPath, this->_outputPath , this->_params);
 }
 
 void AsyncPreprocessor::HandleOKCallback()
@@ -52,20 +41,25 @@ void AsyncPreprocessor::HandleOKCallback()
 
 NAN_METHOD(preprocess)
 {
+
+  Params params;
   v8::String::Utf8Value inputPathjs(info[0]->ToString());
   v8::String::Utf8Value outputPathjs(info[1]->ToString());
 
-  unsigned int blur       = info[2]->Uint32Value();
-  unsigned int threshold  = info[3]->Uint32Value();
-  unsigned int matrix     = info[4]->Uint32Value();
-  unsigned int constant   = info[5]->Uint32Value();
-  bool revert             = info[6]->BooleanValue(); 
-  bool isolate            = info[7]->BooleanValue(); 
-  Callback* callback      = new Callback(info[8].As<Function>());
+  params.blur         = info[2]->Uint32Value();
+  params.threshold    = info[3]->Uint32Value();
+  params.matrix       = info[4]->Uint32Value();
+  params.constant     = info[5]->Uint32Value();
+  params.revert       = info[6]->BooleanValue(); 
+  params.isolate      = info[7]->BooleanValue(); 
+  params.deskew       = info[8]->BooleanValue();
+  params.matchCount   = info[9]->Uint32Value();
+  params.ratio        = info[10]->NumberValue();
+  params.lineStep     = info[11]->Uint32Value();
+  Callback* callback  = new Callback(info[12].As<Function>());
 
   std::string inputPath   = std::string(*inputPathjs);
   std::string outputPath  = std::string(*outputPathjs);
 
-  AsyncQueueWorker(new AsyncPreprocessor(inputPath, outputPath, blur ,
-        threshold, matrix, constant , revert , isolate ,callback));
+  AsyncQueueWorker(new AsyncPreprocessor(inputPath, outputPath, params , callback));
 }

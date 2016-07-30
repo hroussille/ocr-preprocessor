@@ -2,22 +2,51 @@
 
 using namespace cv;
 
-void doBlur(Mat & target , unsigned int blur)
+void doRotate(Mat& src, double angle)
 {
-  Size size(blur , blur);
+  Mat rotated;
+  Point2f pt(src.cols / 2., src.rows / 2.);
+  Mat r = getRotationMatrix2D(pt, angle, 1.0);
+  warpAffine(src, rotated, r, Size(src.cols, src.rows));
+  src = rotated.clone();
+}
+
+double getSkew(Mat src, unsigned int matchCount,
+    double ratio, unsigned int lineStep)
+{
+
+  std::vector<cv::Vec4i> lines;
+  cvtColor(src, src, CV_BGR2GRAY);
+  Mat img_bw = src > 128;
+  Size size = src.size();
+  bitwise_not(img_bw, img_bw);
+  HoughLinesP(img_bw, lines, 1, CV_PI / 180,
+      matchCount, size.width / ratio, lineStep);
+
+  double angle = 0.;
+  unsigned nb_lines = lines.size();
+  for (unsigned i = 0; i < nb_lines; ++i)
+    angle += atan2((double)lines[i][3] - lines[i][1], (double)lines[i][2] - lines[i][0]);
+  angle /= nb_lines; // mean angle, in radians.
+  return angle * 180 / CV_PI;
+}
+
+void doBlur(Mat& target, unsigned int blur)
+{
+  Size size(blur, blur);
 
   if (blur == 0)
     return;
 
-  GaussianBlur(target , target , size , 0);
+  GaussianBlur(target, target, size, 0);
 }
 
-void doThreshold(Mat & target , unsigned int threshold , unsigned int matrix , unsigned int constant)
+void doThreshold(Mat& target, unsigned int threshold, unsigned int matrix, unsigned int constant)
 {
-  adaptiveThreshold(target , target , threshold , CV_ADAPTIVE_THRESH_MEAN_C , CV_THRESH_BINARY , matrix , constant);
+  adaptiveThreshold(target, target, threshold, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, matrix, constant);
 }
 
-void doIsolate(Mat & target)
+void doIsolate(Mat& target)
 {
   Mat tmp = target.clone();
   int largest_area = -1;
@@ -39,15 +68,15 @@ void doIsolate(Mat & target)
   }
 
   if (largest_area != -1)
-    target  = target(bounding_rect);
+    target = target(bounding_rect);
 }
 
-void doRevert(Mat & target)
+void doRevert(Mat& target)
 {
   cv::bitwise_not(target, target);
 }
 
-void guard(unsigned int & matrix , unsigned int & blur)
+void guard(unsigned int& matrix, unsigned int& blur)
 {
   if (matrix < 3)
     matrix = 3;
@@ -58,15 +87,9 @@ void guard(unsigned int & matrix , unsigned int & blur)
     blur = blur + 1;
 }
 
-
-bool preprocess(std::string sourcePath, 
-                std::string destinationPath ,
-                unsigned int blur , 
-                unsigned int threshold, 
-                unsigned int matrix , 
-                unsigned int constant , 
-                bool revert , 
-                bool isolate)
+bool preprocess(std::string sourcePath,
+    std::string destinationPath,
+    Params params)
 {
   Mat src;
   Mat dst;
@@ -75,17 +98,25 @@ bool preprocess(std::string sourcePath,
   if (!src.data)
     return false;
 
+
+  if (params.deskew) {
+    doRotate(src, getSkew(src, params.matchCount,
+                      params.ratio, params.lineStep));
+  }
+
   cvtColor(src, dst, CV_BGR2GRAY);
-  guard(matrix , blur);
 
-  if (blur > 0)
-    doBlur(dst , blur);
+  guard(params.matrix, params.blur);
 
-  doThreshold(dst , threshold , matrix , constant);
 
-  if (isolate)
+  if (params.blur > 0)
+    doBlur(dst, params.blur);
+
+  doThreshold(dst, params.threshold, params.matrix, params.constant);
+
+  if (params.isolate)
     doIsolate(dst);
-  if (revert)
+  if (params.revert)
     doRevert(dst);
 
   return imwrite(destinationPath, dst);

@@ -2,6 +2,7 @@
 #define ASYNCPREPROCESSOR_HH
 
 #include <nan.h>
+#include <Params.hh>
 
 using v8::Function;
 using v8::Local;
@@ -22,12 +23,7 @@ class AsyncPreprocessor: public AsyncWorker {
 
   AsyncPreprocessor(std::string inputPath , 
                     std::string outputPath , 
-                    unsigned int blur ,
-                    unsigned int threshold ,
-                    unsigned int matrix ,
-                    unsigned int constant ,
-                    bool revert ,
-                    bool isolate ,
+                    Params params,
                     Callback* callback);
 
   ~AsyncPreprocessor(); 
@@ -40,15 +36,9 @@ class AsyncPreprocessor: public AsyncWorker {
   std::string  _inputPath;
   std::string  _outputPath;
 
-  unsigned int _blur;
-  unsigned int _threshold;
-  unsigned int _matrix;
-  unsigned int _constant;
+  Params _params;
 
-  bool         _revert;
-  bool         _isolate;
-  bool         _result;
-
+  bool _result;
 };
 
 NAN_METHOD(preprocess);
