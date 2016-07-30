@@ -54,6 +54,18 @@ This function accept 4 arguments :
 * const : constant used for thresholding - default to 5
 * revert : does the image need to be reverted - default to false
 * isolate : does the biggest region of the imaged need to be isolated - default to false
+* deskew : try to correct the skew in the image - default to false
+* matchCount : minimun number of similar lines to validate deskew - default to 100
+* ratio : minimum width for a line to be considered valid. - default to 2
+* lineStep : minimum space between two lines - default to 20
+
+Note : ratio is used this way inside of the module :
+
+```c++
+image.width() / ratio;
+```
+
+Therefore , to select lined that are half the width of the image , ratio should be set to 2.
 
 
 ## Asynchronous
