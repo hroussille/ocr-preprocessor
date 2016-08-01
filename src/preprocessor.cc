@@ -51,8 +51,8 @@ void doIsolate(Mat& target)
   Mat tmp = target.clone();
   int largest_area = -1;
   Rect bounding_rect;
-  vector<vector<Point> > contours;
-  vector<Vec4i> hierarchy;
+  std::vector<std::vector<Point> > contours;
+  std::vector<Vec4i> hierarchy;
 
   findContours(tmp, contours, hierarchy,
       CV_RETR_TREE,
